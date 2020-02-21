@@ -558,7 +558,11 @@ fn generate_struct_fields<P: GenerateProtocol>(
         }
 
         if serde_attrs {
-            lines.push(format!("#[serde(rename=\"{}\")]", member_name));
+            let actual_member_name = match service.name() {
+                "MediaConvert" => member.location_name.as_ref().unwrap_or(member_name),
+                _ => member_name,
+            };
+            lines.push(format!("#[serde(rename=\"{}\")]", actual_member_name));
 
             if let Some(member_shape) = service.shape_for_member(member) {
                 if member_shape.shape_type == ShapeType::Blob {
